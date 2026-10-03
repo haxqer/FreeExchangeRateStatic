@@ -2,7 +2,7 @@
 
 [中文](README_zh.md)
 
-Free exchange rates as static JSON, updated hourly. No API key required. Supports browser requests with CORS.
+Free exchange rates as static JSON, with hourly collection and retries within each hour. No API key required. Supports browser requests with CORS.
 
 ## Get the latest rates
 
@@ -49,7 +49,9 @@ Historical files contain the same `timestamp`, `base`, and `rates` as `latest.js
 
 History starts when archiving is enabled; earlier data is not backfilled. Failed collections leave gaps. Scheduled jobs may be delayed or skipped, so 24 records per day are not guaranteed. Rerunning an already archived hour never replaces its snapshot.
 
-Separate workflows attempt to fetch the latest rates and archive history at minutes 17 and 27 of every hour (UTC), respectively. Their automated commits use `Update exchange rate snapshot` and `Archive hourly exchange rate snapshot`. Both workflows share a concurrency lock and publish the complete site; changes to the history index also trigger deployment.
+Separate workflows attempt to fetch the latest rates at minutes 7, 27, and 47 and archive history at minutes 17, 37, and 57 of every hour (UTC). Each workflow has three trigger opportunities per hour to reduce gaps caused by a missed trigger or failed collection. Archive retries skip the upstream request once that hour has a snapshot; unchanged latest rates do not create a commit, and unchanged public files do not trigger a deployment. Their automated commits use `Update exchange rate snapshot` and `Archive hourly exchange rate snapshot`. Both workflows share a concurrency lock and publish the complete site; changes to the history index also trigger deployment.
+
+GitHub scheduling remains best effort: retries cannot guarantee hourly execution during a prolonged scheduling outage. For a strict collection cadence, use an independent scheduler to trigger both workflows through `workflow_dispatch`. Missing hours cannot be reconstructed from the current upstream snapshot.
 
 ## Convert currencies
 

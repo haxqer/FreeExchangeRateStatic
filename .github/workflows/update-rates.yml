@@ -2,8 +2,9 @@ name: Update exchange rates
 
 on:
   schedule:
-    # Run away from the busy start of the hour; GitHub schedules use UTC.
-    - cron: '17 * * * *'
+    # Retry every 20 minutes so one missed trigger does not lose the whole hour.
+    # Offset from archive-rates.yml and the busy start of the hour; times are UTC.
+    - cron: '7,27,47 * * * *'
   workflow_dispatch:
   push:
     branches: [main]

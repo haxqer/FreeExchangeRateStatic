@@ -14,7 +14,7 @@
 </head>
 <body>
   <h1>免费汇率 JSON</h1>
-  <p>每小时尝试更新一次，美元（USD）为基准，覆盖上游提供的全部货币。无需注册或 API Key。</p>
+  <p>按小时采集，并在同一小时内重试。美元（USD）为基准，覆盖上游提供的全部货币。无需注册或 API Key。</p>
   <p><a href="latest.json">访问最新汇率 latest.json</a></p>
   <pre>GET https://haxqer.github.io/FreeExchangeRateStatic/latest.json</pre>
   <p><code>rates.CNY</code> 表示 1 美元兑换的人民币数量。任意货币换算：金额 × <code>rates[目标货币]</code> ÷ <code>rates[原货币]</code>。</p>

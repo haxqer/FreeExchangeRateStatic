@@ -2,8 +2,9 @@ name: Archive hourly exchange rates
 
 on:
   schedule:
-    # Independent collection, offset from latest updates; GitHub schedules use UTC.
-    - cron: '27 * * * *'
+    # Retry every 20 minutes; archive_rates.py preserves the first successful record.
+    # Offset from update-rates.yml and the busy start of the hour; times are UTC.
+    - cron: '17,37,57 * * * *'
   workflow_dispatch:
   push:
     branches: [main]
