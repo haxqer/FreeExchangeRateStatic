@@ -19,6 +19,9 @@
   <pre>GET https://haxqer.github.io/FreeExchangeRateStatic/latest.json</pre>
   <p><code>rates.CNY</code> 表示 1 美元兑换的人民币数量。任意货币换算：金额 × <code>rates[目标货币]</code> ÷ <code>rates[原货币]</code>。</p>
   <p><code>timestamp</code> 是上游汇率的更新时间（Unix 秒），请在使用时检查数据是否足够新。</p>
+  <p><a href="history/index.json">查询历史汇率索引</a>：按 UTC 年/月/日归档，每小时保留第一条成功快照。先读取日期索引，再读取当天索引中的小时文件。</p>
+  <pre>GET history/YYYY/MM/DD/HH.json</pre>
+  <p>历史快照另有 <code>collected_at</code> 记录采集时间。上游汇率未更新时仍保留小时记录；抓取失败或任务漏跑时留空缺。</p>
   <p>数据来自 <a href="https://github.com/haxqer/FreeExchangeRateApi">FreeExchangeRateApi</a>。获取失败时保留上一份有效数据。</p>
   <p><a href="https://github.com/haxqer/FreeExchangeRateStatic">源码、使用示例与更新记录</a></p>
 </body>

@@ -119,6 +119,21 @@ class ArchiveTests(unittest.TestCase):
             self.assertEqual(archive_rates.main(), 1)
         self.assertEqual({path: path.read_bytes() for path in self.history.rglob("*.json")}, original)
 
+    def test_fetch_finishing_after_midnight_archives_in_the_new_utc_day(self) -> None:
+        before = datetime(2026, 10, 2, 23, 59, 59, tzinfo=timezone.utc)
+        after = before + timedelta(seconds=2)
+        snapshot = {**sample_snapshot(), "timestamp": int(after.timestamp()) - 60}
+        with (
+            patch("scripts.archive_rates.datetime") as clock,
+            patch("scripts.archive_rates.fetch_snapshot", return_value=snapshot),
+            patch("sys.argv", ["archive_rates.py", "--history", str(self.history)]),
+            patch("sys.stdout", new_callable=io.StringIO),
+        ):
+            clock.now.side_effect = [before, after]
+            self.assertEqual(archive_rates.main(), 0)
+        self.assertTrue((self.history / "2026/10/03/00.json").exists())
+        self.assertFalse((self.history / "2026/10/02").exists())
+
 
 if __name__ == "__main__":
     unittest.main()

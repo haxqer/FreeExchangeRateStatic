@@ -6,7 +6,7 @@ import unittest
 from unittest.mock import patch
 from urllib.error import HTTPError, URLError
 
-from scripts.check_site import needs_deployment
+from scripts.check_site import needs_deployment, public_files
 
 
 class SiteTests(unittest.TestCase):
@@ -60,6 +60,38 @@ class SiteTests(unittest.TestCase):
         with self.assertRaises(FileNotFoundError):
             needs_deployment("https://example.com/rates", (missing_file,))
         urlopen.assert_not_called()
+
+    @patch("scripts.check_site.urlopen")
+    def test_new_history_requires_deployment_even_when_latest_is_unchanged(self, urlopen) -> None:
+        root = Path(self.directory.name)
+        history = root / "history"
+        history.mkdir()
+        (history / "index.json").write_bytes(b'{"timezone":"UTC","days":["2026-10-03"]}')
+        urlopen.side_effect = [
+            io.BytesIO(self.snapshot.read_bytes()), io.BytesIO(self.index.read_bytes()),
+            io.BytesIO(b'{"timezone":"UTC","days":[]}'),
+        ]
+        self.assertTrue(needs_deployment("https://example.com/rates", public_files(root), root))
+        self.assertEqual(urlopen.call_args.args[0].full_url, "https://example.com/rates/history/index.json")
+
+    @patch("scripts.check_site.urlopen")
+    def test_complete_unchanged_site_skips_deployment(self, urlopen) -> None:
+        root = Path(self.directory.name)
+        history = root / "history"
+        history.mkdir()
+        (history / "index.json").write_bytes(b'{"timezone":"UTC","days":[]}')
+        files = public_files(root)
+        urlopen.side_effect = [io.BytesIO(file.read_bytes()) for file in files]
+        self.assertFalse(needs_deployment("https://example.com/rates", files, root))
+        self.assertEqual(urlopen.call_count, 3)
+
+    def test_missing_history_index_fails_instead_of_silently_skipping_history(self) -> None:
+        root = Path(self.directory.name)
+        (root / "history").mkdir()
+        with patch("scripts.check_site.urlopen") as urlopen:
+            urlopen.side_effect = [io.BytesIO(file.read_bytes()) for file in self.files]
+            with self.assertRaises(FileNotFoundError):
+                needs_deployment("https://example.com/rates", public_files(root), root)
 
 
 if __name__ == "__main__":
