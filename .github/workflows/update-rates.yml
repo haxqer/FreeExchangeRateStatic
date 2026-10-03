@@ -28,31 +28,34 @@ concurrency:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
-      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
-        with:
-          python-version: '3.12'
-      - run: python -m unittest discover -s tests -v
+      - run: python3 -m unittest discover -s tests -v
 
   update:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-    needs: test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:
       contents: write
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           ref: main
-      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
-        with:
-          python-version: '3.12'
+      # Ubuntu 24.04 already includes Python 3.12; no runtime or dependencies to install.
+      - name: Test code changes
+        if: github.event_name == 'push'
+        run: python3 -m unittest discover -s tests -v
       - name: Fetch and validate rates
-        run: python scripts/update_rates.py
+        run: python3 scripts/update_rates.py
       - name: Commit updated snapshot
         run: |
           git add latest.json
@@ -62,27 +65,24 @@ jobs:
             git commit -m 'Update exchange rate snapshot'
             git push origin HEAD:main
           fi
+      - name: Check whether the public site needs an update
+        id: site
+        if: github.event_name != 'workflow_dispatch'
+        env:
+          SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+        run: python3 scripts/check_site.py --site-url "$SITE_URL" >> "$GITHUB_OUTPUT"
       - name: Prepare public files
+        if: github.event_name == 'workflow_dispatch' || steps.site.outputs.deploy == 'true'
         run: |
           mkdir -p _site
           cp latest.json index.html _site/
           touch _site/.nojekyll
-      - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
+      - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
+        if: github.event_name == 'workflow_dispatch' || steps.site.outputs.deploy == 'true'
         with:
           path: _site
-
-  deploy:
-    needs: update
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
+          retention-days: 1
       - name: Deploy to GitHub Pages
         id: deployment
+        if: github.event_name == 'workflow_dispatch' || steps.site.outputs.deploy == 'true'
         uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
