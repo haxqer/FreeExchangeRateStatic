@@ -96,7 +96,14 @@ def publish_snapshot(snapshot: dict[str, object], output: Path) -> bool:
             raise ValueError("The existing snapshot has an invalid timestamp")
         if snapshot["timestamp"] < previous_timestamp:
             raise ValueError("Refusing to publish a timestamp older than the existing snapshot")
-    content = json.dumps(snapshot, ensure_ascii=False, allow_nan=False, indent=2) + "\n"
+    return write_json(snapshot, output)
+
+
+def write_json(payload: dict[str, object], output: Path, *, overwrite: bool = True) -> bool:
+    """Atomically write JSON, optionally preserving an existing immutable file."""
+    content = json.dumps(payload, ensure_ascii=False, allow_nan=False, indent=2) + "\n"
+    if not overwrite and output.exists():
+        return False
     if output.exists() and output.read_text(encoding="utf-8") == content:
         return False
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -110,7 +117,14 @@ def publish_snapshot(snapshot: dict[str, object], output: Path) -> bool:
             temporary.flush()
             os.fsync(temporary.fileno())
         temporary_path.chmod(0o644)
-        os.replace(temporary_path, output)
+        if overwrite:
+            os.replace(temporary_path, output)
+        else:
+            # A hard link creates the destination atomically without replacing it.
+            try:
+                os.link(temporary_path, output)
+            except FileExistsError:
+                return False
     finally:
         if temporary_path is not None and temporary_path.exists():
             temporary_path.unlink()

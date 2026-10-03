@@ -33,6 +33,24 @@ curl -fsSL https://haxqer.github.io/FreeExchangeRateStatic/latest.json
 | `base` | 固定为 `USD`。 |
 | `rates` | 货币代码与汇率的映射，表示 1 USD 可兑换的各币种数量。 |
 
+## 查询历史汇率
+
+历史快照按 **UTC 采集时间**归档，每小时保留第一条成功记录：
+
+```text
+history/index.json                # 总索引：已归档日期、日索引路径及 SHA-256
+history/2026/10/03/index.json     # 当天索引：date、timezone、hours
+history/2026/10/03/02.json        # UTC 02 时的第一条成功快照（路径示例）
+```
+
+[查询已归档日期](https://haxqer.github.io/FreeExchangeRateStatic/history/index.json)，然后读取日索引中存在的小时文件。例如日索引中的 `hours: ["02", "03"]` 表示当天有 `02.json` 和 `03.json`。
+
+历史文件包含与 `latest.json` 相同的 `timestamp`、`base`、`rates`，以及 `collected_at`（UTC ISO 8601 采集时间，例如 `2026-10-03T02:17:08Z`）。`timestamp` 仍表示上游更新时间，因此不同小时可能记录相同的汇率和上游时间戳。
+
+历史从启用归档后开始积累，不回填此前数据。抓取失败的小时留空缺；定时任务可能延迟或漏跑，因此每天不保证有 24 条。重复执行同一小时不会覆盖已有快照。
+
+最新汇率与历史归档由两个独立工作流维护，分别在每小时第 17、27 分钟尝试抓取（UTC）。自动提交分别使用 `Update exchange rate snapshot` 和 `Archive hourly exchange rate snapshot`。两个工作流共用并发锁并发布完整站点，历史索引发生变化时也会触发部署。
+
 ## 换算货币
 
 ```javascript

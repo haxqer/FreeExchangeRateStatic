@@ -33,6 +33,24 @@ Example response (partial, for illustration):
 | `base` | Always `USD`. |
 | `rates` | Currency codes mapped to the amount of each currency per 1 USD. |
 
+## Query historical rates
+
+Snapshots are archived by **UTC collection time**, keeping the first successful record each hour:
+
+```text
+history/index.json                # Available dates, daily index paths and SHA-256 hashes
+history/2026/10/03/index.json     # Daily index: date, timezone, hours
+history/2026/10/03/02.json        # First successful snapshot in UTC hour 02 (example path)
+```
+
+[Find available dates](https://haxqer.github.io/FreeExchangeRateStatic/history/index.json), then use each daily index to find available hourly files. For example, `hours: ["02", "03"]` means that day has `02.json` and `03.json`.
+
+Historical files contain the same `timestamp`, `base`, and `rates` as `latest.json`, plus `collected_at` (UTC ISO 8601 collection time, such as `2026-10-03T02:17:08Z`). The source `timestamp` is preserved, so different hours may contain identical rates and source timestamps.
+
+History starts when archiving is enabled; earlier data is not backfilled. Failed collections leave gaps. Scheduled jobs may be delayed or skipped, so 24 records per day are not guaranteed. Rerunning an already archived hour never replaces its snapshot.
+
+Separate workflows attempt to fetch the latest rates and archive history at minutes 17 and 27 of every hour (UTC), respectively. Their automated commits use `Update exchange rate snapshot` and `Archive hourly exchange rate snapshot`. Both workflows share a concurrency lock and publish the complete site; changes to the history index also trigger deployment.
+
 ## Convert currencies
 
 ```javascript
