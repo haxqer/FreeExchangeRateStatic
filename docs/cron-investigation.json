@@ -1,0 +1,253 @@
+{
+  "captured_at": "2026-10-03T12:34:46.044926+00:00",
+  "repository": {
+    "full_name": "haxqer/FreeExchangeRateStatic",
+    "created_at": "2026-10-03T02:48:15Z",
+    "default_branch": "main",
+    "fork": false,
+    "archived": false,
+    "disabled": false
+  },
+  "actions_permissions": {
+    "enabled": true,
+    "allowed_actions": "all",
+    "sha_pinning_required": false
+  },
+  "pages_environment": {
+    "name": "github-pages",
+    "protection_rules": [
+      {
+        "id": 67514686,
+        "node_id": "GA_kwDOU5mhWc4EBjE-",
+        "type": "branch_policy"
+      }
+    ],
+    "deployment_branch_policy": {
+      "protected_branches": false,
+      "custom_branch_policies": true
+    }
+  },
+  "workflows": [
+    {
+      "id": 373653612,
+      "name": "Archive hourly exchange rates",
+      "path": ".github/workflows/archive-rates.yml",
+      "state": "active",
+      "created_at": "2026-10-03T11:21:43.000+08:00",
+      "updated_at": "2026-10-03T11:21:43.000+08:00"
+    },
+    {
+      "id": 373642597,
+      "name": "Update exchange rates",
+      "path": ".github/workflows/update-rates.yml",
+      "state": "active",
+      "created_at": "2026-10-03T10:55:52.000+08:00",
+      "updated_at": "2026-10-03T10:55:52.000+08:00"
+    }
+  ],
+  "runs": [
+    {
+      "id": 37122382105,
+      "name": "Update exchange rates",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-03T12:17:19Z",
+      "run_started_at": "2026-10-03T12:17:19Z",
+      "updated_at": "2026-10-03T12:18:00Z",
+      "head_sha": "5c00d4f751e7d4ee20f17f1fedf61905e5a7ad10",
+      "head_branch": "main",
+      "html_url": "https://github.com/haxqer/FreeExchangeRateStatic/actions/runs/37122382105",
+      "run_attempt": 1,
+      "actor": "haxqer"
+    },
+    {
+      "id": 37122382034,
+      "name": "Archive hourly exchange rates",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-03T12:17:19Z",
+      "run_started_at": "2026-10-03T12:17:19Z",
+      "updated_at": "2026-10-03T12:17:42Z",
+      "head_sha": "5c00d4f751e7d4ee20f17f1fedf61905e5a7ad10",
+      "head_branch": "main",
+      "html_url": "https://github.com/haxqer/FreeExchangeRateStatic/actions/runs/37122382034",
+      "run_attempt": 1,
+      "actor": "haxqer"
+    },
+    {
+      "id": 37112524127,
+      "name": "Archive hourly exchange rates",
+      "event": "schedule",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-03T09:17:06Z",
+      "run_started_at": "2026-10-03T09:17:06Z",
+      "updated_at": "2026-10-03T09:17:29Z",
+      "head_sha": "e37c2c3d4b47cfd26160ca28e6e89c73aa08e4d4",
+      "head_branch": "main",
+      "html_url": "https://github.com/haxqer/FreeExchangeRateStatic/actions/runs/37112524127",
+      "run_attempt": 1,
+      "actor": "haxqer"
+    },
+    {
+      "id": 37111991272,
+      "name": "Update exchange rates",
+      "event": "schedule",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-03T09:07:37Z",
+      "run_started_at": "2026-10-03T09:07:37Z",
+      "updated_at": "2026-10-03T09:07:57Z",
+      "head_sha": "37d1079d1cbac8e3e224bdcad2cdd034fff5ea69",
+      "head_branch": "main",
+      "html_url": "https://github.com/haxqer/FreeExchangeRateStatic/actions/runs/37111991272",
+      "run_attempt": 1,
+      "actor": "haxqer"
+    },
+    {
+      "id": 37092940242,
+      "name": "Archive hourly exchange rates",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-03T03:21:44Z",
+      "run_started_at": "2026-10-03T03:21:44Z",
+      "updated_at": "2026-10-03T03:22:03Z",
+      "head_sha": "9a9754190b8abc8709023705e72a77c01a4c01ea",
+      "head_branch": "main",
+      "html_url": "https://github.com/haxqer/FreeExchangeRateStatic/actions/runs/37092940242",
+      "run_attempt": 1,
+      "actor": "haxqer"
+    },
+    {
+      "id": 37092940232,
+      "name": "Update exchange rates",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-03T03:21:44Z",
+      "run_started_at": "2026-10-03T03:21:44Z",
+      "updated_at": "2026-10-03T03:22:24Z",
+      "head_sha": "9a9754190b8abc8709023705e72a77c01a4c01ea",
+      "head_branch": "main",
+      "html_url": "https://github.com/haxqer/FreeExchangeRateStatic/actions/runs/37092940232",
+      "run_attempt": 1,
+      "actor": "haxqer"
+    },
+    {
+      "id": 37092136487,
+      "name": "Update exchange rates",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-03T03:07:19Z",
+      "run_started_at": "2026-10-03T03:07:19Z",
+      "updated_at": "2026-10-03T03:07:31Z",
+      "head_sha": "0fbb8e1923ee07545682daf71ca969799fd0ba20",
+      "head_branch": "main",
+      "html_url": "https://github.com/haxqer/FreeExchangeRateStatic/actions/runs/37092136487",
+      "run_attempt": 1,
+      "actor": "haxqer"
+    },
+    {
+      "id": 37091820270,
+      "name": "Update exchange rates",
+      "event": "workflow_dispatch",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-03T03:01:41Z",
+      "run_started_at": "2026-10-03T03:01:41Z",
+      "updated_at": "2026-10-03T03:01:58Z",
+      "head_sha": "9246c6b43549f7a511147f21c884f923ebec5c55",
+      "head_branch": "main",
+      "html_url": "https://github.com/haxqer/FreeExchangeRateStatic/actions/runs/37091820270",
+      "run_attempt": 1,
+      "actor": "haxqer"
+    },
+    {
+      "id": 37091789583,
+      "name": "Update exchange rates",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-03T03:01:10Z",
+      "run_started_at": "2026-10-03T03:01:10Z",
+      "updated_at": "2026-10-03T03:01:23Z",
+      "head_sha": "9246c6b43549f7a511147f21c884f923ebec5c55",
+      "head_branch": "main",
+      "html_url": "https://github.com/haxqer/FreeExchangeRateStatic/actions/runs/37091789583",
+      "run_attempt": 1,
+      "actor": "haxqer"
+    },
+    {
+      "id": 37091492618,
+      "name": "Update exchange rates",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-03T02:55:58Z",
+      "run_started_at": "2026-10-03T02:55:58Z",
+      "updated_at": "2026-10-03T02:56:29Z",
+      "head_sha": "befdd56530db5b9aeb62592a58395085abf55f7a",
+      "head_branch": "main",
+      "html_url": "https://github.com/haxqer/FreeExchangeRateStatic/actions/runs/37091492618",
+      "run_attempt": 1,
+      "actor": "haxqer"
+    }
+  ],
+  "scheduled_jobs": {
+    "37112524127": [
+      {
+        "name": "archive",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-03T09:17:11Z",
+        "completed_at": "2026-10-03T09:17:28Z"
+      },
+      {
+        "name": "test",
+        "status": "completed",
+        "conclusion": "skipped",
+        "started_at": "2026-10-03T09:17:07Z",
+        "completed_at": "2026-10-03T09:17:07Z"
+      }
+    ],
+    "37111991272": [
+      {
+        "name": "update",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-03T09:07:42Z",
+        "completed_at": "2026-10-03T09:07:56Z"
+      },
+      {
+        "name": "test",
+        "status": "completed",
+        "conclusion": "skipped",
+        "started_at": "2026-10-03T09:07:38Z",
+        "completed_at": "2026-10-03T09:07:38Z"
+      }
+    ]
+  },
+  "old_schedules": {
+    "latest": "17 * * * *",
+    "archive": "27 * * * *",
+    "configuration_commit": "9a9754190b8abc8709023705e72a77c01a4c01ea"
+  },
+  "github_status": {
+    "page": {
+      "id": "kctbh9vrtdwd",
+      "name": "GitHub",
+      "url": "https://www.githubstatus.com",
+      "time_zone": "Etc/UTC",
+      "updated_at": "2026-10-03T09:58:02.365Z"
+    },
+    "status": {
+      "indicator": "none",
+      "description": "All Systems Operational"
+    }
+  },
+  "unresolved_incidents": []
+}

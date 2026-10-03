@@ -1,78 +1,13 @@
-name: Archive hourly exchange rates
+name: Archive exchange rates (manual compatibility)
 
 on:
-  schedule:
-    # Retry every 20 minutes; archive_rates.py preserves the first successful record.
-    # Offset from update-rates.yml and the busy start of the hour; times are UTC.
-    - cron: '17,37,57 * * * *'
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/archive-rates.yml'
-      - '.github/actions/publish-site/**'
-      - 'scripts/archive_rates.py'
-      - 'scripts/update_rates.py'
-      - 'scripts/check_site.py'
-      - 'tests/**'
-      - 'history/**'
-  pull_request:
-    paths:
-      - '.github/workflows/archive-rates.yml'
-      - '.github/actions/publish-site/**'
-      - 'scripts/archive_rates.py'
-      - 'scripts/update_rates.py'
-      - 'scripts/check_site.py'
-      - 'tests/**'
 
 permissions:
-  contents: read
-
-concurrency:
-  # Shared with update-rates.yml to serialize main commits and complete-site deployments.
-  group: exchange-rates-${{ github.ref }}
-  cancel-in-progress: false
+  contents: write
+  pages: write
+  id-token: write
 
 jobs:
-  test:
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
-      - run: python3 -m unittest discover -s tests -v
-
-  archive:
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    permissions:
-      contents: write
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
-        with:
-          ref: main
-      - name: Test code changes
-        if: github.event_name == 'push'
-        run: python3 -m unittest discover -s tests -v
-      - name: Fetch and archive rates
-        run: python3 scripts/archive_rates.py
-      - name: Commit hourly archive
-        run: |
-          git add history/
-          if ! git diff --cached --quiet; then
-            git config user.name 'github-actions[bot]'
-            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-            git commit -m 'Archive hourly exchange rate snapshot'
-            git push origin HEAD:main
-          fi
-      - name: Publish complete site
-        id: deployment
-        uses: ./.github/actions/publish-site
-        with:
-          force-deploy: ${{ github.event_name == 'workflow_dispatch' }}
+  collect:
+    uses: ./.github/workflows/update-rates.yml

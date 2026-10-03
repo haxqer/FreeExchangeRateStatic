@@ -1,36 +1,36 @@
-name: Update exchange rates
+name: Collect and publish exchange rates
 
 on:
   schedule:
-    # Retry every 20 minutes so one missed trigger does not lose the whole hour.
-    # Offset from archive-rates.yml and the busy start of the hour; times are UTC.
+    # One collection per UTC hour, with retries for missed triggers or failed publishing.
+    # GitHub scheduling is best effort; these are opportunities, not an execution guarantee.
     - cron: '7,27,47 * * * *'
   workflow_dispatch:
+  workflow_call:
   push:
     branches: [main]
     paths:
       - '.github/workflows/update-rates.yml'
+      - '.github/workflows/archive-rates.yml'
       - '.github/actions/publish-site/**'
-      - 'scripts/update_rates.py'
-      - 'scripts/check_site.py'
-      - 'tests/test_update_rates.py'
-      - 'tests/test_check_site.py'
+      - 'scripts/**'
+      - 'tests/**'
       - 'index.html'
       - 'latest.json'
+      - 'history/**'
   pull_request:
     paths:
       - '.github/workflows/update-rates.yml'
+      - '.github/workflows/archive-rates.yml'
       - '.github/actions/publish-site/**'
-      - 'scripts/update_rates.py'
-      - 'scripts/check_site.py'
-      - 'tests/test_update_rates.py'
-      - 'tests/test_check_site.py'
+      - 'scripts/**'
+      - 'tests/**'
 
 permissions:
   contents: read
 
 concurrency:
-  # Shared with archive-rates.yml to serialize main commits and complete-site deployments.
+  # Serialize collection, commits, deployments, and the manual compatibility entry.
   group: exchange-rates-${{ github.ref }}
   cancel-in-progress: false
 
@@ -55,6 +55,16 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Record trigger details
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          SCHEDULE: ${{ github.event.schedule }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          {
+            printf 'Event: %s\n\nSchedule: %s\n\n' "$EVENT_NAME" "${SCHEDULE:-not a scheduled event}"
+            printf 'Job started (UTC): %s\n\nRun: %s\n' "$(date -u +%FT%TZ)" "$RUN_URL"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           ref: main
@@ -62,15 +72,18 @@ jobs:
       - name: Test code changes
         if: github.event_name == 'push'
         run: python3 -m unittest discover -s tests -v
-      - name: Fetch and validate rates
-        run: python3 scripts/update_rates.py
-      - name: Commit updated snapshot
+      - name: Collect or recover this hour
+        id: collection
+        run: python3 scripts/collect_rates.py
+      - name: Commit latest and hourly history together
+        # Keep a collected hour even when updating latest or rebuilding indexes failed.
+        if: ${{ !cancelled() && (steps.collection.outcome == 'success' || steps.collection.outcome == 'failure') }}
         run: |
-          git add latest.json
+          git add latest.json history/
           if ! git diff --cached --quiet; then
             git config user.name 'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-            git commit -m 'Update exchange rate snapshot'
+            git commit -m 'Collect hourly exchange rate snapshot'
             git push origin HEAD:main
           fi
       - name: Publish complete site
