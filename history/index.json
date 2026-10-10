@@ -35,6 +35,11 @@
       "date": "2026-10-09",
       "path": "2026/10/09/index.json",
       "sha256": "66288feafc6bcb6f2b03a92e6e2f79e9a2b7a59fc540e1377c7f6983e3d82af4"
+    },
+    {
+      "date": "2026-10-10",
+      "path": "2026/10/10/index.json",
+      "sha256": "4eb7e0e29c243fad2231378b9aa0fdc2dec73a90ccf510d10a077225b85af1af"
     }
   ]
 }
