@@ -50,6 +50,11 @@
       "date": "2026-10-12",
       "path": "2026/10/12/index.json",
       "sha256": "2b479209282d216b5dae8319bbf47c6af7f32b426a13941fb1e377e7fb993ab7"
+    },
+    {
+      "date": "2026-10-13",
+      "path": "2026/10/13/index.json",
+      "sha256": "b477e772ed06c88b9bcce635a1bcd535e649b99165ee89f0348f74c1a2065a19"
     }
   ]
 }
