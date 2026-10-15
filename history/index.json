@@ -60,6 +60,11 @@
       "date": "2026-10-14",
       "path": "2026/10/14/index.json",
       "sha256": "97c983aa5f7161cb11aeeb3ac41a2f97fa93b033fe2efad662b2e901bfd293c4"
+    },
+    {
+      "date": "2026-10-15",
+      "path": "2026/10/15/index.json",
+      "sha256": "6411b4b0ce6947aa49f2f2d5dbf756cd7f8c22ac3317b12894e8bd0e8a66bce2"
     }
   ]
 }
