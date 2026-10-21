@@ -1,30 +1,9 @@
 name: Collect and publish exchange rates
 
 on:
-  schedule:
-    # One collection per UTC hour, with retries for missed triggers or failed publishing.
-    # GitHub scheduling is best effort; these are opportunities, not an execution guarantee.
-    - cron: '7,27,47 * * * *'
+  # Manual runs only; GitHub no longer starts this workflow automatically.
   workflow_dispatch:
   workflow_call:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/update-rates.yml'
-      - '.github/workflows/archive-rates.yml'
-      - '.github/actions/publish-site/**'
-      - 'scripts/**'
-      - 'tests/**'
-      - 'index.html'
-      - 'latest.json'
-      - 'history/**'
-  pull_request:
-    paths:
-      - '.github/workflows/update-rates.yml'
-      - '.github/workflows/archive-rates.yml'
-      - '.github/actions/publish-site/**'
-      - 'scripts/**'
-      - 'tests/**'
 
 permissions:
   contents: read
@@ -35,16 +14,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  test:
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
-      - run: python3 -m unittest discover -s tests -v
-
   update:
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:
@@ -58,20 +29,16 @@ jobs:
       - name: Record trigger details
         env:
           EVENT_NAME: ${{ github.event_name }}
-          SCHEDULE: ${{ github.event.schedule }}
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           {
-            printf 'Event: %s\n\nSchedule: %s\n\n' "$EVENT_NAME" "${SCHEDULE:-not a scheduled event}"
+            printf 'Event: %s\n\n' "$EVENT_NAME"
             printf 'Job started (UTC): %s\n\nRun: %s\n' "$(date -u +%FT%TZ)" "$RUN_URL"
           } | tee -a "$GITHUB_STEP_SUMMARY"
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           ref: main
       # Ubuntu 24.04 already includes Python 3.12; no runtime or dependencies to install.
-      - name: Test code changes
-        if: github.event_name == 'push'
-        run: python3 -m unittest discover -s tests -v
       - name: Collect or recover this hour
         id: collection
         run: python3 scripts/collect_rates.py
