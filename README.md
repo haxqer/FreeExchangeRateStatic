@@ -2,7 +2,7 @@
 
 [中文](README_zh.md)
 
-Free exchange rates as static JSON, with hourly collection and retries within each hour. No API key required. Supports browser requests with CORS.
+Free exchange rates as static JSON, collected once an hour. No API key required. Supports browser requests with CORS.
 
 ## Get the latest rates
 
@@ -47,13 +47,13 @@ history/2026/10/03/02.json        # First successful snapshot in UTC hour 02 (ex
 
 Historical files contain the same `timestamp`, `base`, and `rates` as `latest.json`, plus `collected_at` (UTC ISO 8601 collection time, such as `2026-10-03T02:17:08Z`). The source `timestamp` is preserved, so different hours may contain identical rates and source timestamps.
 
-History starts when archiving is enabled; earlier data is not backfilled. Failed collections leave gaps. Scheduled jobs may be delayed or skipped, so 24 records per day are not guaranteed. Rerunning an already archived hour never replaces its snapshot.
+History starts when archiving is enabled; earlier data is not backfilled. Failed collections leave gaps, so 24 records per day are not guaranteed. Rerunning an already archived hour never replaces its snapshot.
 
-One workflow, **Collect and publish exchange rates**, runs only when triggered manually; GitHub no longer starts it on a schedule, on push, or for pull requests. The first successful collection fetches the public API once and saves both the hourly archive and `latest.json`. Retries use the saved hourly record to repair incomplete writes without fetching again or overwriting history; a newer `latest.json` is preserved. Both outputs are committed together with `Collect hourly exchange rate snapshot`, then the complete site is published. Saved history is also committed if a later collection step fails, so a subsequent run can recover it. An upstream failure before any data is saved leaves the previous files intact.
+Collection runs on a self-hosted server, not GitHub Actions: a systemd timer runs [`scripts/collect_and_push.sh`](scripts/collect_and_push.sh) once an hour at minute 7 (UTC), 24 times a day. The first successful collection fetches the public API once and saves both the hourly archive and `latest.json`. Rerunning within the same hour uses the saved hourly record to repair incomplete writes without fetching again or overwriting history; a newer `latest.json` is preserved. Both outputs are committed together with `Collect hourly exchange rate snapshot` and pushed to `main`, which GitHub Pages publishes. Saved history is also committed if a later collection step fails. A commit that cannot be pushed stays on the server and is pushed by the next run. An upstream failure before any data is saved leaves the previous files intact.
 
-The workflow serializes collection and publishing. Unchanged files do not create a commit or a deployment; source updates after the first collection are picked up by a run in a later hour. The former archive workflow is retained as a manual compatibility entry calling the same pipeline. Each run's summary records its event type and job start time. [Scheduling investigation](docs/cron-investigation.md) contains the original run timeline and the limits of the diagnosis.
+Unchanged files do not create a commit; source updates after the first collection are picked up in the next hour. The service and timer units are in [`deploy/`](deploy/), and run logs are in the server's systemd journal. [Scheduling investigation](docs/cron-investigation.md) records why the former GitHub Actions schedule was replaced.
 
-Data is updated only by manual runs: trigger `update-rates.yml` with `workflow_dispatch` to collect the current hour and retry publishing. Hours without a run leave gaps. Runs that never start have no job log, and a snapshot that cannot be pushed may be lost with the temporary runner. Missing hours cannot be reconstructed from the current upstream snapshot.
+Hours when the server is down or the upstream request fails leave gaps; after downtime, the timer runs once to collect the current hour. Missing hours cannot be reconstructed from the current upstream snapshot.
 
 ## Convert currencies
 

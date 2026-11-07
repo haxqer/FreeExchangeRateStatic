@@ -1,0 +1,9 @@
+[Unit]
+Description=Collect hourly exchange rates and push to GitHub (/data/FreeExchangeRateStatic)
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/data/FreeExchangeRateStatic/scripts/collect_and_push.sh
+TimeoutStartSec=5min
