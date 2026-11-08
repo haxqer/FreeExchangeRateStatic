@@ -100,6 +100,11 @@
       "date": "2026-11-07",
       "path": "2026/11/07/index.json",
       "sha256": "92888ac43cf544c99d4b6213c3d1cfdbbaecffccbef2d60fe5abae007ab1de1f"
+    },
+    {
+      "date": "2026-11-08",
+      "path": "2026/11/08/index.json",
+      "sha256": "815f77d9e67f54d1ea75d56822ea8dfc3cb60ee6320d119daf754fd245a907c1"
     }
   ]
 }
