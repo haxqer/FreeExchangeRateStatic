@@ -110,6 +110,11 @@
       "date": "2026-11-09",
       "path": "2026/11/09/index.json",
       "sha256": "46099807c161b9f4bcb721102afd4f0376ccaf8c40c3a6b4d77c6c8a14877d5e"
+    },
+    {
+      "date": "2026-11-10",
+      "path": "2026/11/10/index.json",
+      "sha256": "84292ece4a58b739a1779eb6f9ee07924fd306172682c0b2cd08a5b0eacd2b2d"
     }
   ]
 }
