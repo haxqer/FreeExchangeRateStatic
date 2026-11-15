@@ -135,6 +135,11 @@
       "date": "2026-11-14",
       "path": "2026/11/14/index.json",
       "sha256": "454c270d77496f7e3bb9cb197e2137e234bc32137034bb49fb322cdb79d37b5e"
+    },
+    {
+      "date": "2026-11-15",
+      "path": "2026/11/15/index.json",
+      "sha256": "4ea9ea2e767cbc777692df1d03e81039a0eda549c66887bed6f3b7aa1b85b933"
     }
   ]
 }
