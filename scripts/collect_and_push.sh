@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Hourly job on the collection server: collect this hour, commit, and push to main.
-# GitHub Pages publishes main after each push.
+# Files are served from main via raw.githubusercontent.com; GitHub Actions and Pages are disabled.
 set -uo pipefail
 
 # Run from a function so a pull that updates this file cannot change the running job.

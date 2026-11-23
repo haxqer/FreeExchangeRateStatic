@@ -6,10 +6,10 @@ Free exchange rates as static JSON, collected once an hour. No API key required.
 
 ## Get the latest rates
 
-**[Download latest.json](https://haxqer.github.io/FreeExchangeRateStatic/latest.json)** · [Backup URL](https://raw.githubusercontent.com/haxqer/FreeExchangeRateStatic/main/latest.json)
+**[Download latest.json](https://raw.githubusercontent.com/haxqer/FreeExchangeRateStatic/main/latest.json)**
 
 ```bash
-curl -fsSL https://haxqer.github.io/FreeExchangeRateStatic/latest.json
+curl -fsSL https://raw.githubusercontent.com/haxqer/FreeExchangeRateStatic/main/latest.json
 ```
 
 Example response (partial, for illustration):
@@ -43,13 +43,13 @@ history/2026/10/03/index.json     # Daily index: date, timezone, hours
 history/2026/10/03/02.json        # First successful snapshot in UTC hour 02 (example path)
 ```
 
-[Find available dates](https://haxqer.github.io/FreeExchangeRateStatic/history/index.json), then use each daily index to find available hourly files. For example, `hours: ["02", "03"]` means that day has `02.json` and `03.json`.
+[Find available dates](https://raw.githubusercontent.com/haxqer/FreeExchangeRateStatic/main/history/index.json), then use each daily index to find available hourly files. For example, `hours: ["02", "03"]` means that day has `02.json` and `03.json`.
 
 Historical files contain the same `timestamp`, `base`, and `rates` as `latest.json`, plus `collected_at` (UTC ISO 8601 collection time, such as `2026-10-03T02:17:08Z`). The source `timestamp` is preserved, so different hours may contain identical rates and source timestamps.
 
 History starts when archiving is enabled; earlier data is not backfilled. Failed collections leave gaps, so 24 records per day are not guaranteed. Rerunning an already archived hour never replaces its snapshot.
 
-Collection runs on a self-hosted server, not GitHub Actions: a systemd timer runs [`scripts/collect_and_push.sh`](scripts/collect_and_push.sh) once an hour at minute 7 (UTC), 24 times a day. The first successful collection fetches the public API once and saves both the hourly archive and `latest.json`. Rerunning within the same hour uses the saved hourly record to repair incomplete writes without fetching again or overwriting history; a newer `latest.json` is preserved. Both outputs are committed together with `Collect hourly exchange rate snapshot` and pushed to `main`, which GitHub Pages publishes. Saved history is also committed if a later collection step fails. A commit that cannot be pushed stays on the server and is pushed by the next run. An upstream failure before any data is saved leaves the previous files intact.
+Collection runs on a self-hosted server, not GitHub Actions: a systemd timer runs [`scripts/collect_and_push.sh`](scripts/collect_and_push.sh) once an hour at minute 7 (UTC), 24 times a day. The first successful collection fetches the public API once and saves both the hourly archive and `latest.json`. Rerunning within the same hour uses the saved hourly record to repair incomplete writes without fetching again or overwriting history; a newer `latest.json` is preserved. Both outputs are committed together with `Collect hourly exchange rate snapshot` and pushed to `main`, and the files are served straight from the repository (raw.githubusercontent.com, cached for up to 5 minutes). GitHub Actions and GitHub Pages are disabled for this repository, so pushes trigger no workflow runs. Saved history is also committed if a later collection step fails. A commit that cannot be pushed stays on the server and is pushed by the next run. An upstream failure before any data is saved leaves the previous files intact.
 
 Unchanged files do not create a commit; source updates after the first collection are picked up in the next hour. The service and timer units are in [`deploy/`](deploy/), and run logs are in the server's systemd journal. [Scheduling investigation](docs/cron-investigation.md) records why the former GitHub Actions schedule was replaced.
 
@@ -58,7 +58,7 @@ Hours when the server is down or the upstream request fails leave gaps; after do
 ## Convert currencies
 
 ```javascript
-const response = await fetch('https://haxqer.github.io/FreeExchangeRateStatic/latest.json');
+const response = await fetch('https://raw.githubusercontent.com/haxqer/FreeExchangeRateStatic/main/latest.json');
 if (!response.ok) throw new Error(`HTTP ${response.status}`);
 const { rates } = await response.json();
 

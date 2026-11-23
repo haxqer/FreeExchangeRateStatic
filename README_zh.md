@@ -6,10 +6,10 @@
 
 ## 获取最新汇率
 
-**[访问 latest.json](https://haxqer.github.io/FreeExchangeRateStatic/latest.json)** · [备用地址](https://raw.githubusercontent.com/haxqer/FreeExchangeRateStatic/main/latest.json)
+**[访问 latest.json](https://raw.githubusercontent.com/haxqer/FreeExchangeRateStatic/main/latest.json)**
 
 ```bash
-curl -fsSL https://haxqer.github.io/FreeExchangeRateStatic/latest.json
+curl -fsSL https://raw.githubusercontent.com/haxqer/FreeExchangeRateStatic/main/latest.json
 ```
 
 响应示例（仅展示部分货币，数值用于演示）：
@@ -43,13 +43,13 @@ history/2026/10/03/index.json     # 当天索引：date、timezone、hours
 history/2026/10/03/02.json        # UTC 02 时的第一条成功快照（路径示例）
 ```
 
-[查询已归档日期](https://haxqer.github.io/FreeExchangeRateStatic/history/index.json)，然后读取日索引中存在的小时文件。例如日索引中的 `hours: ["02", "03"]` 表示当天有 `02.json` 和 `03.json`。
+[查询已归档日期](https://raw.githubusercontent.com/haxqer/FreeExchangeRateStatic/main/history/index.json)，然后读取日索引中存在的小时文件。例如日索引中的 `hours: ["02", "03"]` 表示当天有 `02.json` 和 `03.json`。
 
 历史文件包含与 `latest.json` 相同的 `timestamp`、`base`、`rates`，以及 `collected_at`（UTC ISO 8601 采集时间，例如 `2026-10-03T02:17:08Z`）。`timestamp` 仍表示上游更新时间，因此不同小时可能记录相同的汇率和上游时间戳。
 
 历史从启用归档后开始积累，不回填此前数据。抓取失败的小时留空缺，因此每天不保证有 24 条。重复执行同一小时不会覆盖已有快照。
 
-采集在自有服务器上运行，不使用 GitHub Actions：systemd 定时器在每小时第 7 分钟（UTC）运行一次 [`scripts/collect_and_push.sh`](scripts/collect_and_push.sh)，每天 24 次。当前小时首次成功采集时只请求一次公开 API，同时保存小时快照和 `latest.json`。同一小时内再次运行时，使用已保存的小时记录修复未完成的写入，不重复请求上游、不覆盖历史，也不回退较新的 `latest.json`。最新文件与历史一起提交，提交信息为 `Collect hourly exchange rate snapshot`，推送到 `main` 后由 GitHub Pages 发布。若后续采集步骤失败，已保存的历史仍会提交。推送失败的提交留在服务器上，由下一次运行推送。上游在保存数据前失败时，原文件保持不变。
+采集在自有服务器上运行，不使用 GitHub Actions：systemd 定时器在每小时第 7 分钟（UTC）运行一次 [`scripts/collect_and_push.sh`](scripts/collect_and_push.sh)，每天 24 次。当前小时首次成功采集时只请求一次公开 API，同时保存小时快照和 `latest.json`。同一小时内再次运行时，使用已保存的小时记录修复未完成的写入，不重复请求上游、不覆盖历史，也不回退较新的 `latest.json`。最新文件与历史一起提交，提交信息为 `Collect hourly exchange rate snapshot`，推送到 `main` 后直接由仓库文件对外提供（raw.githubusercontent.com，最多缓存 5 分钟）。本仓库已关闭 GitHub Actions 和 GitHub Pages，推送不会触发任何 workflow。若后续采集步骤失败，已保存的历史仍会提交。推送失败的提交留在服务器上，由下一次运行推送。上游在保存数据前失败时，原文件保持不变。
 
 文件未变化时不产生提交；首次采集之后的上游变化在下一小时获取。service 和 timer 配置见 [`deploy/`](deploy/)，运行日志在服务器的 systemd journal 中。[定时调度排查记录](docs/cron-investigation.md)记录了弃用 GitHub Actions 定时任务的原因。
 
@@ -58,7 +58,7 @@ history/2026/10/03/02.json        # UTC 02 时的第一条成功快照（路径�
 ## 换算货币
 
 ```javascript
-const response = await fetch('https://haxqer.github.io/FreeExchangeRateStatic/latest.json');
+const response = await fetch('https://raw.githubusercontent.com/haxqer/FreeExchangeRateStatic/main/latest.json');
 if (!response.ok) throw new Error(`HTTP ${response.status}`);
 const { rates } = await response.json();
 
